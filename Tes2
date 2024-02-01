@@ -1,0 +1,44 @@
+Sub SendEmailsFromExcel()
+    Dim OutApp As Object
+    Dim OutMail As Object
+    Dim wsData As Worksheet
+    Dim recipientRange As Range
+    Dim subject As String
+    Dim body As String
+    Dim recipientCell As Range
+    
+    ' Set reference to the worksheet containing data
+    Set wsData = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to the name of your sheet
+    
+    ' Define recipient range
+    Set recipientRange = wsData.Range("A2:A" & wsData.Cells(wsData.Rows.Count, "A").End(xlUp).Row)
+    
+    ' Get subject and body from specific cells
+    subject = wsData.Range("B1").Value ' Assuming subject is in cell B1
+    body = wsData.Range("B2").Value ' Assuming body is in cell B2
+    
+    ' Create an Outlook application object
+    Set OutApp = CreateObject("Outlook.Application")
+    
+    ' Loop through each recipient in the range
+    For Each recipientCell In recipientRange
+        ' Create a new email message
+        Set OutMail = OutApp.CreateItem(0)
+        With OutMail
+            .To = recipientCell.Value
+            .Subject = subject
+            .Body = body
+            ' Add any other properties as needed, such as attachments
+            '.Attachments.Add ("C:\path\to\attachment.txt")
+            ' Send the email
+            .Send
+        End With
+        ' Release the email object
+        Set OutMail = Nothing
+    Next recipientCell
+    
+    ' Release the Outlook application object
+    Set OutApp = Nothing
+    
+    MsgBox "Emails have been sent successfully.", vbInformation
+End Sub
